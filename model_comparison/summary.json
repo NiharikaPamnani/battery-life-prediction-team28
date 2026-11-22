@@ -1,0 +1,19 @@
+{
+  "team": 28,
+  "rows_raw": 2000,
+  "rows_cleaned": 1976,
+  "validation_rows": 395,
+  "glitch_counts": {
+    "non_finite": 0,
+    "battery_v": 11,
+    "temp_c": 3,
+    "rings_per_day": 0,
+    "wifi_rssi_dbm": 10,
+    "age_months": 0,
+    "days_left": 0,
+    "total_rows_removed": 24
+  },
+  "selection_metric": "validation_mae",
+  "deployed_model": "Neural network; retained for small edge footprint",
+  "best_validation_model": "Neural network"
+}
