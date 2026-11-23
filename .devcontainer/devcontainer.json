@@ -1,10 +1,11 @@
 {
-  "name": "Edge AI Assignment 1 - Battery API",
+  "name": "BatteryLife AI - Team 28",
   "image": "mcr.microsoft.com/devcontainers/python:3.11",
   "postCreateCommand": "pip install -r requirements.txt",
-  "forwardPorts": [8000],
+  "forwardPorts": [8000, 8501],
   "portsAttributes": {
-    "8000": { "label": "battery-api", "onAutoForward": "notify" }
+    "8000": { "label": "battery-api", "onAutoForward": "notify" },
+    "8501": { "label": "battery-dashboard", "onAutoForward": "openBrowser" }
   },
   "customizations": {
     "vscode": { "extensions": ["ms-python.python", "ms-toolsai.jupyter"] }

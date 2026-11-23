@@ -1,0 +1,6 @@
+model,hyperparameters,training_time_seconds,inference_ms_per_sample,validation_mae,validation_rmse,validation_r2,model_artifact,artifact_file_bytes,training_mae,hyperparameter_search_seconds
+Neural network,"{""hidden"": [32, 32], ""normalisation"": ""training mean/std""}",33.930000,0.155011,5.498982,7.679408,0.987090,model/model.pt,7869,4.386154,
+XGBoost,"{""colsample_bytree"": 0.9, ""learning_rate"": 0.05, ""max_depth"": 5, ""n_estimators"": 200, ""n_jobs"": 1, ""objective"": ""reg:squarederror"", ""random_state"": 0, ""reg_lambda"": 1.0, ""subsample"": 0.9, ""tree_method"": ""hist"", ""verbosity"": 0}",0.173934,0.498764,5.675091,8.849468,0.982856,model_comparison/models/xgboost.json,654500,,0.976698
+Random Forest,"{""max_depth"": 12, ""min_samples_leaf"": 1, ""n_estimators"": 300, ""n_jobs"": 1, ""random_state"": 0}",1.946975,40.837681,7.211906,11.285084,0.972120,model_comparison/models/random_forest.joblib,35007857,,9.474679
+Linear regression,"{""intercept"": true, ""solver"": ""numpy.linalg.lstsq""}",0.000405,0.009816,23.365921,31.281148,0.785786,model_comparison/models/linear_regression.npz,302,,
+Mean baseline,"{""prediction"": ""training-target mean""}",0.000089,0.002072,53.972000,67.647477,-0.001809,model_comparison/models/mean_baseline.joblib,21,,

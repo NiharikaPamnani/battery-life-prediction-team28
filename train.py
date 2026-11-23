@@ -2,6 +2,7 @@
 import argparse
 import csv
 import json
+import time
 from pathlib import Path
 
 import numpy as np
@@ -41,12 +42,17 @@ def clean_data(frame: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, int]]:
     return frame.loc[~invalid].copy(), reasons
 
 
-def split_data(frame: pd.DataFrame):
+def split_frame(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     rng = np.random.default_rng(0)
     indices = rng.permutation(len(frame))
     validation_count = len(frame) // 5
     validation = frame.iloc[indices[:validation_count]]
     training = frame.iloc[indices[validation_count:]]
+    return training, validation
+
+
+def split_data(frame: pd.DataFrame):
+    training, validation = split_frame(frame)
     x_train = training[FEATURES].to_numpy(dtype=np.float32)
     y_train = training["days_left"].to_numpy(dtype=np.float32)
     x_val = validation[FEATURES].to_numpy(dtype=np.float32)
@@ -252,10 +258,13 @@ def main() -> None:
         run_sweep(x_train, y_train, x_val, y_val, mean, scale, args.epochs, args.plots_dir or Path("plots"))
         return
 
+    training_started = time.perf_counter()
     network, train_mae, val_mae = fit_network(
         x_train, y_train, x_val, y_val, mean, scale, args.hidden, args.epochs, log_progress=True
     )
+    training_time_seconds = time.perf_counter() - training_started
     print(f"network {args.hidden}: train MAE {train_mae:.2f} days; validation MAE {val_mae:.2f} days")
+    print(f"network training time: {training_time_seconds:.3f} seconds")
 
     model_dir = Path("model")
     model_dir.mkdir(exist_ok=True)
@@ -269,6 +278,7 @@ def main() -> None:
         "features": FEATURES,
         "train_mae": round(train_mae, 2),
         "val_mae": round(val_mae, 2),
+        "training_time_seconds": round(training_time_seconds, 3),
         "glitch_rows_removed": glitch_counts["total_rows_removed"],
     }
     with (model_dir / "config.json").open("w", encoding="utf-8") as file:

@@ -28,5 +28,6 @@
   ],
   "train_mae": 4.39,
   "val_mae": 5.5,
+  "training_time_seconds": 33.93,
   "glitch_rows_removed": 24
 }
