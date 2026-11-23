@@ -14,9 +14,8 @@ import time
 
 import numpy as np
 import torch
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, ValidationError
+from fastapi import FastAPI
+from pydantic import BaseModel, Field
 
 from app.model import FEATURES, FEATURE_RANGES, BatteryNet, model_metrics
 
@@ -66,19 +65,16 @@ def health():
     return {"status": "ok", "team": cfg["team"], "params": N_PARAMS, "val_mae": cfg["val_mae"]}
 
 
-async def run(request: Request, schema: type[BaseModel]):
+async def run(data: Reading | Batch):
     t_all = time.perf_counter()
     timings = {}
     t0 = time.perf_counter()
-    try:
-        data = schema.model_validate_json(await request.body())
-    except ValidationError as e:
-        return JSONResponse(status_code=422, content={"error": "bad reading", "detail": json.loads(e.json())})
+    rows = data.rows if isinstance(data, Batch) else [data]
+    values = [[getattr(r, f) for f in FEATURES] for r in rows]
     timings["parse"] = ms(t0)
 
     t0 = time.perf_counter()
-    rows = data.rows if isinstance(data, Batch) else [data]
-    x = (np.array([[getattr(r, f) for f in FEATURES] for r in rows], np.float32) - MU) / SD
+    x = (np.array(values, np.float32) - MU) / SD
     timings["normalise"] = ms(t0)
 
     t0 = time.perf_counter()
@@ -96,10 +92,10 @@ async def run(request: Request, schema: type[BaseModel]):
 
 
 @app.post("/predict")
-async def predict(request: Request):
-    return await run(request, Reading)
+async def predict(reading: Reading):
+    return await run(reading)
 
 
 @app.post("/predict_batch")
-async def predict_batch(request: Request):
-    return await run(request, Batch)
+async def predict_batch(batch: Batch):
+    return await run(batch)
