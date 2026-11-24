@@ -10,12 +10,16 @@ POST /predict_batch   {"rows": [reading, ...]} -> {"days_left": [...], "timings_
 A reading that is out of range gets HTTP 422 with the reason, never a guess.
 """
 import json
+import math
 import time
 
 import numpy as np
 import torch
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from starlette.responses import JSONResponse
 
 from app.model import API_FEATURE_RANGES, FEATURES, BatteryNet, model_metrics
 
@@ -30,15 +34,17 @@ N_PARAMS = sum(p.numel() for p in net.parameters())
 
 
 class Reading(BaseModel):
-    battery_v: float = Field(allow_inf_nan=False)
-    temp_c: float = Field(allow_inf_nan=False)
-    rings_per_day: float = Field(allow_inf_nan=False)
-    wifi_rssi_dbm: float = Field(allow_inf_nan=False)
-    age_months: float = Field(allow_inf_nan=False)
+    battery_v: float
+    temp_c: float
+    rings_per_day: float
+    wifi_rssi_dbm: float
+    age_months: float
 
     @field_validator(*FEATURES)
     @classmethod
     def validate_observed_range(cls, value: float, info: ValidationInfo) -> float:
+        if not math.isfinite(value):
+            raise ValueError(f"{info.field_name} must be finite")
         low, high = API_FEATURE_RANGES[info.field_name]
         if not low <= value <= high:
             raise ValueError(
@@ -53,6 +59,24 @@ class Batch(BaseModel):
 
 app = FastAPI(title="Doorbell battery API")
 ms = lambda t0: round((time.perf_counter() - t0) * 1000, 3)
+
+
+def json_safe_validation_details(value):
+    if isinstance(value, float) and not math.isfinite(value):
+        return str(value)
+    if isinstance(value, dict):
+        return {key: json_safe_validation_details(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [json_safe_validation_details(item) for item in value]
+    return value
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content=jsonable_encoder({"detail": json_safe_validation_details(exc.errors())}),
+    )
 
 
 @app.get("/model_info")

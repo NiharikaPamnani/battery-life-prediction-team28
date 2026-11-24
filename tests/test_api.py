@@ -68,6 +68,28 @@ class BatteryApiTests(unittest.TestCase):
                 self.assertEqual(response.status_code, 422)
                 self.assertEqual(response.json()["detail"][0]["loc"], ["body", field])
 
+    def test_non_finite_values_are_rejected_for_predict_and_batch(self):
+        for value in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(endpoint="/predict", value=value):
+                response = self.client.post(
+                    "/predict", json={**self.reading, "battery_v": value}
+                )
+                self.assertEqual(response.status_code, 422, response.text)
+                self.assertEqual(
+                    response.json()["detail"][0]["loc"], ["body", "battery_v"]
+                )
+
+            with self.subTest(endpoint="/predict_batch", value=value):
+                response = self.client.post(
+                    "/predict_batch",
+                    json={"rows": [{**self.reading, "battery_v": value}]},
+                )
+                self.assertEqual(response.status_code, 422, response.text)
+                self.assertEqual(
+                    response.json()["detail"][0]["loc"],
+                    ["body", "rows", 0, "battery_v"],
+                )
+
     def test_batch_rejects_an_invalid_row_with_row_and_feature_location(self):
         rows = [
             self.reading,
