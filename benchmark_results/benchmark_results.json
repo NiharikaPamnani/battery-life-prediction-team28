@@ -1,0 +1,114 @@
+{
+  "benchmark": {
+    "script": "client/bench.py",
+    "command": "python client/bench.py --url http://127.0.0.1:8000 --n 200",
+    "completed_at_utc": "2026-11-24T06:52:32Z",
+    "endpoint": "POST /predict",
+    "connection_reuse": true,
+    "requests_requested": 200,
+    "requests_succeeded": 200,
+    "request_generation_seed": 1,
+    "scope": "Loopback API benchmark inside this Codespace; not external-network or target-board latency."
+  },
+  "model": {
+    "artifact": "model/model.pt",
+    "artifact_size_bytes": 7869,
+    "artifact_sha256": "bb4f81d6dbb7c59b2b44a66630c2d754b1601d6eaa7a96aeafe926a96e073274",
+    "architecture": [
+      5,
+      32,
+      32,
+      1
+    ],
+    "parameters": 1281,
+    "weight_storage_fp32_bytes": 5124,
+    "macs_per_prediction": 1216,
+    "api_health": {
+      "status": "ok",
+      "team": 28,
+      "validation_mae_days": 5.5
+    }
+  },
+  "environment": {
+    "os": "Linux 6.8.0-1070-azure x86_64",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "logical_processors_visible": 2,
+    "cpu_cgroup_quota": "unlimited",
+    "system_ram_total_kib": 8132872,
+    "system_ram_available_kib_after_run": 5117380,
+    "memory_cgroup_limit": "unlimited",
+    "memory_cgroup_current_bytes_after_run": 2808950784,
+    "memory_cgroup_peak_bytes": 2824523776,
+    "memory_cgroup_note": "Whole Codespace cgroup usage, not benchmark-only memory.",
+    "python_version": "3.11.18",
+    "pytorch_version": "2.15.0+cpu",
+    "numpy_version": "2.4.6",
+    "requests_version": "2.34.2",
+    "torch_intraop_threads": 1
+  },
+  "memory_measurements": {
+    "api_process_rss_kib": 259544,
+    "api_process_peak_rss_kib": 259544,
+    "api_process_measured_at_utc": "2026-11-24T06:53:55Z",
+    "model_weight_storage_fp32_bytes": 5124,
+    "model_artifact_file_bytes": 7869,
+    "note": "Process RSS includes the Python API runtime and loaded libraries; weight storage and artifact size are separate measurements."
+  },
+  "latency_ms": {
+    "first_request_cold": {
+      "round_trip": 432.611,
+      "parse": 0.011,
+      "normalise": 2.494,
+      "inference": 424.85,
+      "build": 0.385,
+      "server_total": 427.771,
+      "network_and_framework": 4.84
+    },
+    "requests_2_through_200": {
+      "sample_count": 199,
+      "percentile_method": "NumPy default percentile",
+      "round_trip": {
+        "p50": 3.096,
+        "p95": 4.968,
+        "p99": 5.764,
+        "mean": 3.294
+      },
+      "parse": {
+        "p50": 0.005,
+        "p95": 0.007,
+        "p99": 0.008,
+        "mean": 0.005
+      },
+      "normalise": {
+        "p50": 0.029,
+        "p95": 0.045,
+        "p99": 0.061,
+        "mean": 0.031
+      },
+      "inference": {
+        "p50": 0.195,
+        "p95": 0.312,
+        "p99": 0.603,
+        "mean": 0.212
+      },
+      "build": {
+        "p50": 0.02,
+        "p95": 0.029,
+        "p99": 0.05,
+        "mean": 0.021
+      },
+      "server_total": {
+        "p50": 0.262,
+        "p95": 0.409,
+        "p99": 0.734,
+        "mean": 0.285
+      },
+      "network_and_framework": {
+        "p50": 2.796,
+        "p95": 4.642,
+        "p99": 5.36,
+        "mean": 3.008
+      }
+    }
+  }
+}
