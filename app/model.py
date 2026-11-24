@@ -11,6 +11,13 @@ FEATURE_RANGES = {
     "wifi_rssi_dbm": (-110.0, -1.0),
     "age_months": (0.0, 600.0),
 }
+API_FEATURE_RANGES = {
+    "battery_v": (3.35, 4.20),
+    "temp_c": (8.0, 46.0),
+    "rings_per_day": (0.0, 43.0),
+    "wifi_rssi_dbm": (-88.0, -45.0),
+    "age_months": (0.0, 36.0),
+}
 SRAM_BUDGET_BYTES = 300 * 1024
 PSRAM_BUDGET_BYTES = 8 * 1024 * 1024
 

@@ -15,9 +15,9 @@ import time
 import numpy as np
 import torch
 from fastapi import FastAPI
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
-from app.model import FEATURES, FEATURE_RANGES, BatteryNet, model_metrics
+from app.model import API_FEATURE_RANGES, FEATURES, BatteryNet, model_metrics
 
 with open("model/config.json", encoding="utf-8") as file:
     cfg = json.load(file)
@@ -30,21 +30,21 @@ N_PARAMS = sum(p.numel() for p in net.parameters())
 
 
 class Reading(BaseModel):
-    battery_v: float = Field(
-        ge=FEATURE_RANGES["battery_v"][0], le=FEATURE_RANGES["battery_v"][1], allow_inf_nan=False
-    )
-    temp_c: float = Field(
-        ge=FEATURE_RANGES["temp_c"][0], le=FEATURE_RANGES["temp_c"][1], allow_inf_nan=False
-    )
-    rings_per_day: float = Field(
-        ge=FEATURE_RANGES["rings_per_day"][0], le=FEATURE_RANGES["rings_per_day"][1], allow_inf_nan=False
-    )
-    wifi_rssi_dbm: float = Field(
-        ge=FEATURE_RANGES["wifi_rssi_dbm"][0], le=FEATURE_RANGES["wifi_rssi_dbm"][1], allow_inf_nan=False
-    )
-    age_months: float = Field(
-        ge=FEATURE_RANGES["age_months"][0], le=FEATURE_RANGES["age_months"][1], allow_inf_nan=False
-    )
+    battery_v: float = Field(allow_inf_nan=False)
+    temp_c: float = Field(allow_inf_nan=False)
+    rings_per_day: float = Field(allow_inf_nan=False)
+    wifi_rssi_dbm: float = Field(allow_inf_nan=False)
+    age_months: float = Field(allow_inf_nan=False)
+
+    @field_validator(*FEATURES)
+    @classmethod
+    def validate_observed_range(cls, value: float, info: ValidationInfo) -> float:
+        low, high = API_FEATURE_RANGES[info.field_name]
+        if not low <= value <= high:
+            raise ValueError(
+                f"{info.field_name} must be between {low:g} and {high:g} (inclusive)"
+            )
+        return value
 
 
 class Batch(BaseModel):

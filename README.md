@@ -43,18 +43,18 @@ The selected network has ReLU activations, training-row-only standardization, an
 
 ## Dataset and preprocessing
 
-`data/team_28_train.csv` contains 2,000 records, five inputs, and the `days_left` target. Input limits are intentionally broader than observed sample extrema so plausible future readings are not rejected:
+`data/team_28_train.csv` contains 2,000 records, five inputs, and the `days_left` target. Training cleanup uses broad physical sensor limits, while the API accepts only values within the observed ranges of the cleaned training data:
 
 | Field | Meaning | Accepted API range |
 |---|---|---:|
-| `battery_v` | Battery voltage (V) | 2.0 to 4.5 |
-| `temp_c` | Temperature (°C) | -40 to 85 |
-| `rings_per_day` | Daily doorbell rings | 0 to 1,000 |
-| `wifi_rssi_dbm` | Wi-Fi received signal (dBm) | -110 to -1 |
-| `age_months` | Device age in months | 0 to 600 |
+| `battery_v` | Battery voltage (V) | 3.35 to 4.20 |
+| `temp_c` | Temperature (°C) | 8 to 46 |
+| `rings_per_day` | Daily doorbell rings | 0 to 43 |
+| `wifi_rssi_dbm` | Wi-Fi received signal (dBm) | -88 to -45 |
+| `age_months` | Device age in months | 0 to 36 |
 | `days_left` | Prediction target (days) | finite and non-negative in training data |
 
-The fixed split shuffles cleaned row positions with NumPy seed 0: 1,581 training rows and 395 validation rows. The MLP's mean and standard deviation are fitted only on its training rows and reused at serving time. The linear baseline uses `numpy.linalg.lstsq` with an intercept. The tree-model selection uses validation MAE; their candidate grids and selected settings are recorded in `model_comparison/metrics.csv`.
+Inputs outside the accepted API ranges receive HTTP 422 responses. The fixed split shuffles cleaned row positions with NumPy seed 0: 1,581 training rows and 395 validation rows. The MLP's mean and standard deviation are fitted only on its training rows and reused at serving time. The linear baseline uses `numpy.linalg.lstsq` with an intercept. The tree-model selection uses validation MAE; their candidate grids and selected settings are recorded in `model_comparison/metrics.csv`.
 
 ## Dashboard
 

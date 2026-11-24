@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 import requests
 import streamlit as st
 
-from app.model import FEATURES, FEATURE_RANGES, PSRAM_BUDGET_BYTES, SRAM_BUDGET_BYTES
+from app.model import API_FEATURE_RANGES, FEATURES, PSRAM_BUDGET_BYTES, SRAM_BUDGET_BYTES
 from train import clean_data
 
 
@@ -98,27 +98,27 @@ def draw_prediction_page(api_url: str) -> None:
     with st.form("prediction_form"):
         first, second, third = st.columns(3)
         battery = first.number_input(
-            "Battery voltage (V)", min_value=FEATURE_RANGES["battery_v"][0],
-            max_value=FEATURE_RANGES["battery_v"][1], value=3.86, step=0.01,
-            help="Broad sensor-operating limits; not clamped to the training sample's observed range.",
+            "Battery voltage (V)", min_value=API_FEATURE_RANGES["battery_v"][0],
+            max_value=API_FEATURE_RANGES["battery_v"][1], value=3.86, step=0.01,
+            help="Accepted range observed in the training dataset.",
         )
         temperature = second.number_input(
-            "Temperature (°C)", min_value=FEATURE_RANGES["temp_c"][0],
-            max_value=FEATURE_RANGES["temp_c"][1], value=28.0, step=0.5
+            "Temperature (°C)", min_value=API_FEATURE_RANGES["temp_c"][0],
+            max_value=API_FEATURE_RANGES["temp_c"][1], value=28.0, step=0.5
         )
         rings = third.number_input(
-            "Rings per day", min_value=FEATURE_RANGES["rings_per_day"][0],
-            max_value=FEATURE_RANGES["rings_per_day"][1], value=5.0, step=1.0
+            "Rings per day", min_value=API_FEATURE_RANGES["rings_per_day"][0],
+            max_value=API_FEATURE_RANGES["rings_per_day"][1], value=5.0, step=1.0
         )
         fourth, fifth, _ = st.columns(3)
         rssi = fourth.number_input(
-            "Wi-Fi RSSI (dBm)", min_value=FEATURE_RANGES["wifi_rssi_dbm"][0],
-            max_value=FEATURE_RANGES["wifi_rssi_dbm"][1], value=-66.0, step=1.0,
+            "Wi-Fi RSSI (dBm)", min_value=API_FEATURE_RANGES["wifi_rssi_dbm"][0],
+            max_value=API_FEATURE_RANGES["wifi_rssi_dbm"][1], value=-66.0, step=1.0,
             help="More negative readings represent weaker received signal strength.",
         )
         age = fifth.number_input(
-            "Device age (months)", min_value=FEATURE_RANGES["age_months"][0],
-            max_value=FEATURE_RANGES["age_months"][1], value=22.0, step=1.0
+            "Device age (months)", min_value=API_FEATURE_RANGES["age_months"][0],
+            max_value=API_FEATURE_RANGES["age_months"][1], value=22.0, step=1.0
         )
         submitted = st.form_submit_button("🔋 Predict Battery Life", type="primary", use_container_width=True)
 

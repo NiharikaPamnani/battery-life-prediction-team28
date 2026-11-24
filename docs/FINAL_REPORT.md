@@ -50,9 +50,9 @@ The raw plots visibly expose the 0 V, -127 °C, and 0 dBm records. These are not
 
 ## 5. Data Cleaning and Preprocessing
 
-Cleaning uses broad physical plausibility limits shared between training and API validation:
+Training cleanup uses broad physical plausibility limits:
 
-| Field | Training/API validity rule | Rows flagged |
+| Field | Training cleaning rule | Rows flagged |
 |---|---:|---:|
 | `battery_v` | finite and 2.0 to 4.5 V | 11 |
 | `temp_c` | finite and -40 to 85 °C | 3 |
@@ -61,7 +61,7 @@ Cleaning uses broad physical plausibility limits shared between training and API
 | `age_months` | finite and 0 to 600 months | 0 |
 | `days_left` | finite and non-negative | 0 |
 
-There were no overlapping flags in this CSV: 24 of 2,000 rows were removed, leaving 1,976. Limits are intentionally wider than the training data's observed ranges, so examples such as a -95 dBm signal or a device older than 36 months remain valid.
+There were no overlapping flags in this CSV: 24 of 2,000 rows were removed, leaving 1,976. The API separately restricts prediction inputs to the cleaned dataset's observed feature ranges: battery voltage 3.35–4.20 V, temperature 8–46 °C, rings per day 0–43, Wi-Fi RSSI -88 to -45 dBm, and device age 0–36 months. Requests outside these ranges receive HTTP 422 responses.
 
 The row indices are shuffled with `numpy.random.default_rng(0)`. The first 395 shuffled rows form validation data; the remaining 1,581 are training data. The MLP's mean and standard deviation are computed from training inputs only:
 
